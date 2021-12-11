@@ -20,7 +20,7 @@ def app():
         results = [i.split('\t') for i in out.splitlines()]
 
         blast_df = pd.DataFrame(data=results, columns=['NCBI_Accession', 'id_pc','e_value','bit_score'])
-        # blast_df['NCBI_Accession'] = blast_df['NCBI_Accession'].apply(lambda x : x.split('|')[1])
+        blast_df['NCBI_Accession'] = blast_df['NCBI_Accession'].apply(lambda x : x.split('|')[1])
         blast_df['bit_score'] = pd.to_numeric(blast_df['bit_score'])
 
         scored_db = database.merge(blast_df).sort_values(by=['bit_score'], ascending=False).reset_index(drop=True)
