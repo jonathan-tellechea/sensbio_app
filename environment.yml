@@ -5,4 +5,4 @@ dependencies:
   - streamlit
   - biopython
   - pip
-    - rdkit-pypi
+    - https://www.wheelodex.org/projects/rdkit-pypi/wheels/rdkit_pypi-2021.9.2.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl/
