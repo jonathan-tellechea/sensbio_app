@@ -1,0 +1,6 @@
+name: sensbio
+dependencies:
+  - numpy
+  - pandas
+  - rdkit
+  - biopython
