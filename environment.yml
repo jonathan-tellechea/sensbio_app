@@ -2,7 +2,7 @@ name: sensbio
 dependencies:
   - numpy
   - pandas
-  - streammlit
+  - streamlit
   - biopython
   - pip
-    - rdkit
+    - rdkit-pypi
