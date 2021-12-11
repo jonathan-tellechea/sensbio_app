@@ -1,0 +1,5 @@
+numpy
+pandas
+streamlit
+biopython
+rdkit-pypi
