@@ -3,6 +3,5 @@ pandas
 streamlit
 biopython
 rdkit-pypi
-plotly
 seaborn
 matplotlib
