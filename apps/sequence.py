@@ -24,7 +24,7 @@ def barchartDataframe(dataframe):
     p = [i/sum(y)*100 for i in y]
     
     fig, ax = plt.subplots()
-    ax = sns.set(rc={'figure.figsize':(60,30)})
+    ax = sns.set(rc={'figure.figsize':(120,60)})
     ax = sns.barplot(x=x , y=p)
     ax.axes.set_title("Pathway distribution in the selected dataset",fontsize=120)
     ax.set_ylabel("%",fontsize=120)
