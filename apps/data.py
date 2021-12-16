@@ -79,7 +79,7 @@ def app():
         return G
 
     def plotly_graph(graph):
-        pos = nx.drawing.nx_agraph.graphviz_layout(graph, prog='neato')
+        pos = nx.drawing.nx_agraph.graphviz_layout(graph)# , prog='neato'
         edge_x = []
         edge_y = []
         for edge in graph.edges():
