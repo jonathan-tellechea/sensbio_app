@@ -32,7 +32,16 @@ def tanimoto_calc(smi1, smi2):
     sim = round(DataStructs.TanimotoSimilarity(fp1,fp2),3)
     return sim
 
+
 def app():
+    import os
+    import glob
+    paths = os.environ["PATH"]
+    print (paths)
+    for path in paths.split(os.pathsep):
+        match=glob.glob(os.path.join(path,'neato'))
+    if match:
+        print (match[0])
 
     st.markdown("""
     # Data visualization
