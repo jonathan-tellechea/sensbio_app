@@ -7,4 +7,5 @@ networkx
 plotly
 seaborn
 matplotlib
+graphviz
 pygraphviz
