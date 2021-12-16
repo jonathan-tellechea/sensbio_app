@@ -5,6 +5,35 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit import DataStructs
 
+import seaborn as sns
+import collections
+import matplotlib.pyplot as plt
+
+def barchartDataframe(dataframe):
+    #Graphing the dataset
+    molecules = dataframe.drop_duplicates(subset=['Molecule'])
+    temp = list(molecules['Pathways'].astype(str))
+    temp = [x.split(';') for x in temp if x != 'nan']
+    paths = []
+    for i in temp:
+        for x in i:
+            if x != '':
+                paths.append(x)
+    c = collections.Counter(paths)
+    c = c.most_common()
+    x = [i[0] for i in c]
+    y = [i[1] for i in c]
+    p = [i/sum(y)*100 for i in y]
+    
+    fig, ax = plt.subplots()
+    ax = sns.set(rc={'figure.figsize':(60,30)})
+    ax = sns.barplot(x=x , y=p)
+    ax.axes.set_title("Pathway distribution in the selected dataset",fontsize=120)
+    ax.set_ylabel("%",fontsize=120)
+    ax.set_xticklabels(ax.get_xticklabels(),rotation = 90)
+    ax.tick_params(labelsize=60)
+    st.pyplot(fig)
+
 def app():
     st.markdown("""
     # Molecular similarity tool
@@ -23,7 +52,7 @@ def app():
 
     #define a function to rank the molecules by their Tanimoto score against the input molecule.
     def tanimoto_ranker(query): #query must be a SMILES string
-        df_mol = pd.read_csv('./TF_DB_clean.csv')
+        df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
         simil = []
         for i in df_mol['SMILES']:
             simil.append(float(tanimoto_calc(query,i)))
@@ -34,6 +63,28 @@ def app():
     # user input text boxes for SMILES
     user_input_mol = st.text_input("Paste molecule in SMILES format")
     if user_input_mol != "":
-        st.write(tanimoto_ranker(user_input_mol))
+        df = tanimoto_ranker(user_input_mol)
+        df_head = df.head(100)
+        st.write(df_head)
+
+        @st.cache
+        def convert_df(dataframe):
+            # IMPORTANT: Cache the conversion to prevent computation on every rerun
+            return dataframe.to_csv().encode('utf-8')
+
+        csv = convert_df(df)
+
+        st.download_button(
+            label="Download data as CSV",
+            data=csv,
+            file_name='molecular_prediction_results.csv',
+            mime='text/csv'
+        )
+        barchartDataframe(df_head)
     else:
-        st.write('Please, paste a molecule string in the box above')
+        st.write("Please, paste your target molecule in SMILES format in the box above or paste some example molecules:")
+        st.code('naringenin: O=C1CC(c2ccc(O)cc2)Oc2cc(O)cc(O)c21')
+        st.code('vanillate: COC1=C(C=CC(=C1)C(=O)O)O')
+        st.code('uracil: Oc1ccnc(O)n1')
+    
+    
