@@ -3,3 +3,7 @@ pandas
 streamlit
 biopython
 rdkit-pypi
+networkx
+plotly
+seaborn
+matplotlib
