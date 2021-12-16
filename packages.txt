@@ -1,3 +1,2 @@
 ncbi-blast+
 graphviz-dev
-libgraphviz-dev
