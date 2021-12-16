@@ -1,6 +1,9 @@
 import streamlit as st
 from multiapp import MultiApp
-from apps import data, molecular, sequence # import your app modules here
+from apps import data, molecular, sequence, tutorial# import your app modules here
+
+
+import pandas as pd
 
 app = MultiApp()
 
@@ -20,9 +23,10 @@ The application is divided in three interactive pages.
 
 """)
 
-# Add all your application here
+# Add all application here
 app.add_app("Data visualization", data.app)
 app.add_app("Molecular similarity", molecular.app)
 app.add_app("Sequence similarity", sequence.app)
+app.add_app("Tutorial", tutorial.app)
 # The main app
 app.run()

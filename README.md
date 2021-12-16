@@ -1,21 +1,20 @@
-# sensbio
+# Built with
 
-Tools for biosensor data analysis and prediction.
-
-## Dependencies
-
-Note: when using conda to install some of the following libraries, it automatically installed other co-dependencies (e.g. python, numpy, ...)
-
-- Pandas
-- RDkit
-- BioPython
+- python 3
 - streamlit
-- Emboss
 
-## Installation of dependencies
-1. Install rdkit first --> conda create -c conda-forge -n my-rdkit-env rdkit
-    - This will also install pandas.
-2. Install streamlit --> pip install streamlit
-3. Install biopytho --> conda install -c conda-forge biopython
-4. Install emboss --> conda install -c bioconda/label/cf201901 emboss
+# About Sensbio
 
+Sensbio-app is a simple webserver that allows users to identify possible transcription factors (TFs) inducible by small chemical compounds.
+
+# Usage
+
+Using sensbio-app is really simple. The application is separated in three different pages:
+
+- **Data visualization page:** use it to get to know the data in the sensbio dataset.
+    - Visualize and export the whole database.
+    - Visualize the molecular variety of the database.
+    - Visualize the genetic variety of the database.
+- **Molecular prediction page:** use to identify possible TFs triggered by your input molecule.
+- **TF sequence prediction page:** use to TFs in the database similar to your input protein sequence.
+    
