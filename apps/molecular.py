@@ -83,8 +83,9 @@ def app():
         barchartDataframe(df_head)
     else:
         st.write("Please, paste your target molecule in SMILES format in the box above or paste some example molecules:")
-        st.code('naringenin: O=C1CC(c2ccc(O)cc2)Oc2cc(O)cc(O)c21')
-        st.code('vanillate: COC1=C(C=CC(=C1)C(=O)O)O')
-        st.code('uracil: Oc1ccnc(O)n1')
+        st.code('''Examples:
+        naringenin: O=C1CC(c2ccc(O)cc2)Oc2cc(O)cc(O)c21
+        vanillate: COC1=C(C=CC(=C1)C(=O)O)O
+        uracil: Oc1ccnc(O)n1''')
     
     
