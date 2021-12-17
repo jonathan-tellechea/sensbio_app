@@ -14,7 +14,7 @@ The application is divided into three interactive pages.
 
 - **Data visualization:** designed to help to better understand the sensbio tool.
 - **Molecular prediction:** tool: the user can find molecules similar to their input and find candidate TF where to start the design of new biosensor circuits specific for the target molecule.
-- ****Sequence prediction tool:** the user can find similar protein sequences similar to the ones already described in the database and the ligand molecule that triggers them.
+- **Sequence prediction tool:** the user can find similar protein sequences similar to the ones already described in the database and the ligand molecule that triggers them.
 
 """)
 
