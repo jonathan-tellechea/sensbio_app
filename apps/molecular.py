@@ -9,6 +9,7 @@ import seaborn as sns
 import collections
 import matplotlib.pyplot as plt
 
+
 def barchartDataframe(dataframe):
     #Graphing the dataset
     molecules = dataframe.drop_duplicates(subset=['Molecule'])
@@ -41,6 +42,13 @@ def app():
     Use this page to find similar entries in the database using your target compound in SMILES format as input.
 
     """)
+    # validate SMILE input
+    def chem_validator(query):
+        mol = Chem.MolFromSmiles(query)
+        if mol is None:
+            return False
+        return True
+    
     #defines a function to calculate the tanimoto similarity between two molecules in SMILES format (from https://medium.com/data-professor/how-to-calculate-molecular-similarity-25d543ea7f40).
     def tanimoto_calc(smi1, smi2):
         mol1 = Chem.MolFromSmiles(smi1)
@@ -62,7 +70,7 @@ def app():
 
     # user input text boxes for SMILES
     user_input_mol = st.text_input("Paste molecule in SMILES format")
-    if user_input_mol != "":
+    if user_input_mol != "" and chem_validator(user_input_mol):
         df = tanimoto_ranker(user_input_mol)
         df_head = df.head(100)
         st.write(df_head)

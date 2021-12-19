@@ -38,12 +38,18 @@ def app():
     Use this page to find similar entries in the database using your target protein sequence as input.
     """)
     database = pd.read_csv('./TF_DB_clean_pathway.csv')
-    
+        
     user_input_seq = st.text_input("Paste sequence string")
+    validate = False
     if user_input_seq:
-        blastp_cline = NcbiblastpCommandline(db="BLASTdb", outfmt="6 sseqid pident evalue bitscore") #Blast command
-        out, err = blastp_cline(stdin=user_input_seq)
-
+        try:
+            blastp_cline = NcbiblastpCommandline(db="BLASTdb", outfmt="6 sseqid pident evalue bitscore") #Blast command
+            out, err = blastp_cline(stdin=user_input_seq)
+            validate = True
+        except:
+            print("Wrong sequence format!", user_input_seq)
+            validate = False
+    if user_input_seq and validate:
         results = [i.split('\t') for i in out.splitlines()]
         for i in results:
             if '|' in i[0]:
