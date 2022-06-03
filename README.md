@@ -1,3 +1,8 @@
+
+# About Sensbio
+
+Sensbio-app is a simple webserver that allows users to identify possible transcription factors (TFs) inducible by small chemical compounds.
+
 # Required packages
 
 - python 3
@@ -7,10 +12,6 @@
 - biopython
 
 In addition, a local ncbi-blast+ installation.
-
-# About Sensbio
-
-Sensbio-app is a simple webserver that allows users to identify possible transcription factors (TFs) inducible by small chemical compounds.
 
 # Usage
 
