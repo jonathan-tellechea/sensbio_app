@@ -1,7 +1,12 @@
-# Built with
+# Required packages
 
 - python 3
 - streamlit
+- rdkit
+- seaborn
+- biopython
+
+In addition, a local ncbi-blast+ installation.
 
 # About Sensbio
 
