@@ -112,7 +112,7 @@ def app():
         df_mol = df_mol.sort_values(by=['Tanimoto_score_vs_query'], ascending=False).reset_index(drop=True)
         return df_mol
     
-    st.write("Use this checkbox to decide if predictions are performed over all" 
+    st.write("Use these options to decide if predictions are performed over all" 
              " the database. Otherwise, they will be performed only on the"
              " first 100/500/1000.")
     
