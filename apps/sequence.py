@@ -2,6 +2,12 @@ import streamlit as st
 
 from Bio.Blast.Applications import NcbiblastpCommandline
 import pandas as pd
+import numpy as np
+import tensorflow as tf
+
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit import DataStructs
 
 import seaborn as sns
 import collections
@@ -37,6 +43,36 @@ def app():
     # Sequence similarity tool
     Use this page to find similar entries in the database using your target protein sequence as input.
     """)
+    
+    #define a function to predict affinity between a molecule and a sequence
+    def model_prediction(seq, smi, model):
+        ms = Chem.MolFromSmiles(smi)
+        fp = Chem.RDKFingerprint(ms, fpSize = 512).ToBitString()
+        fp = np.array([int(x) for x in list(fp)])
+        fp = fp.reshape((1,512))
+        
+        aa_list = ["A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R",
+                    "S","T","V","W","Y"]
+        aam = np.zeros((20, 978)).astype(int)
+        pos = 0
+        for aa in seq:
+            if aa == "*" or aa == "X":
+                pos = pos + 1
+                continue
+            aa_idx = aa_list.index(aa)
+            aam[aa_idx][pos] = 1
+            pos = pos + 1
+        aam = aam.reshape((1,20,978))
+            
+        pred_score = model.predict([aam, fp])
+        pred_score = pred_score[0][0]
+        if pred_score < 0:
+            pred_score = 0
+        # elif pred_score > 1:
+        #     pred_score = 1
+            
+        return pred_score
+    
     database = pd.read_csv('./TF_DB_clean_pathway.csv')
         
     user_input_seq = st.text_input("Paste sequence string")
@@ -59,6 +95,14 @@ def app():
         #blast_df['NCBI_Accession'] = blast_df['NCBI_Accession'].apply(lambda x : x.split('|')[1])
         blast_df['bit_score'] = pd.to_numeric(blast_df['bit_score'])
 
+        #loads predictive model
+        pred_model = tf.keras.models.load_model('./final_model')
+        
+        affin = []
+        for j in database['SMILES']:
+            affin.append(model_prediction(user_input_seq,j,pred_model))       
+
+        database['Affinity prediction'] = affin
         df = database.merge(blast_df).sort_values(by=['bit_score'], ascending=False).reset_index(drop=True)
         st.write(df)
 
