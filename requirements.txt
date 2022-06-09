@@ -5,3 +5,4 @@ biopython
 rdkit-pypi
 seaborn
 matplotlib
+tensorflow
