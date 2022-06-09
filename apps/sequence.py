@@ -73,6 +73,29 @@ def app():
             
         return pred_score
     
+    
+    st.write("Use these options to decide if predictions are performed over all" 
+             " the database. Otherwise, they will be performed only on the"
+             " first 100/500/1000.")
+    
+    check = st.radio("Select an option:",
+                     ("Perform predictions over all the database",
+                      "Perform predictions over the first 100",
+                      "Perform predictions over the first 500",
+                      "Perform predictions over the first 1000"))
+    
+    if check == "Perform predictions over all the database":
+        flag = True
+    elif check == "Perform predictions over the first 100":
+        flag = False
+        num_check = 100
+    elif check == "Perform predictions over the first 500":
+        flag = False
+        num_check = 500
+    elif check == "Perform predictions over the first 1000":
+        flag = False
+        num_check = 1000
+    
     database = pd.read_csv('./TF_DB_clean_pathway.csv')
         
     user_input_seq = st.text_input("Paste sequence string")
@@ -95,15 +118,24 @@ def app():
         #blast_df['NCBI_Accession'] = blast_df['NCBI_Accession'].apply(lambda x : x.split('|')[1])
         blast_df['bit_score'] = pd.to_numeric(blast_df['bit_score'])
 
+        df = database.merge(blast_df).sort_values(by=['bit_score'], ascending=False).reset_index(drop=True)
+        
         #loads predictive model
         pred_model = tf.keras.models.load_model('./final_model')
         
-        affin = []
-        for j in database['SMILES']:
-            affin.append(model_prediction(user_input_seq,j,pred_model))       
-
-        database['Affinity prediction'] = affin
-        df = database.merge(blast_df).sort_values(by=['bit_score'], ascending=False).reset_index(drop=True)
+        if flag:
+            affin = []
+            for j in df['SMILES']:
+                affin.append(model_prediction(user_input_seq,j,pred_model))
+        else:
+            affin = [None] * len(df)
+            idx = 0
+            for j in df['SMILES'][0:num_check]:
+                affin[idx] = model_prediction(user_input_seq,j,pred_model)
+                idx += 1
+            
+        df['Affinity prediction'] = affin
+        
         st.write(df)
 
         @st.cache
