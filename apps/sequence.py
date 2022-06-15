@@ -14,6 +14,7 @@ import collections
 import matplotlib.pyplot as plt
 
 from precalc import seq_cod
+from precalc import smi_cod
 
 def barchartDataframe(dataframe):
     #Graphing the dataset
@@ -47,7 +48,7 @@ def app():
     """)
     
     database = pd.read_csv('./TF_DB_clean_pathway.csv')
-    fpmatrix = np.load('./fingerprints_matrix.npy')
+    #fpmatrix = np.load('./fingerprints_matrix.npy')
     pred_model = tf.keras.models.load_model('./final_model')
     
     #define a function to predict affinity between a molecule and a sequence
@@ -102,9 +103,16 @@ def app():
 
         df = database.merge(blast_df).sort_values(by=['bit_score'], ascending=False).reset_index(drop=True)
         
+        
+        fpmatrix = smi_cod(df['SMILES'][0])
+        
+        for j in df['SMILES'][1:]:
+            fpm = smi_cod(j)
+            fpmatrix = np.concatenate((fpmatrix, fpm))
+    
         aa = seq_cod(user_input_seq)
         aa = np.repeat(aa, np.shape(fpmatrix)[0], axis=0)
-        
+    
         preds = model_prediction(aa,fpmatrix,pred_model)
         affin = preds[:,0].tolist()
             
