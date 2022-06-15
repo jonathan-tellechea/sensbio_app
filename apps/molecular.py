@@ -11,6 +11,8 @@ import seaborn as sns
 import collections
 import matplotlib.pyplot as plt
 
+from precalc import smi_cod
+
 
 def barchartDataframe(dataframe):
     #Graphing the dataset
@@ -44,6 +46,12 @@ def app():
     Use this page to find similar entries in the database using your target compound in SMILES format as input.
 
     """)
+    
+    df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
+    aamatrix = np.load('./sequences_matrix.npy')
+    pred_model = tf.keras.models.load_model('./final_model')
+    
+    
     # validate SMILE input
     def chem_validator(query):
         mol = Chem.MolFromSmiles(query)
@@ -61,85 +69,54 @@ def app():
         return sim
     
     #define a function to predict affinity between a molecule and a sequence
-    def model_prediction(seq, smi, model):
-        ms = Chem.MolFromSmiles(smi)
-        fp = Chem.RDKFingerprint(ms, fpSize = 512).ToBitString()
-        fp = np.array([int(x) for x in list(fp)])
-        fp = fp.reshape((1,512))
-        
-        aa_list = ["A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R",
-                   "S","T","V","W","Y"]
-        aam = np.zeros((20, 978)).astype(int)
-        pos = 0
-        for aa in seq:
-            if aa == "*" or aa == "X":
-                pos = pos + 1
-                continue
-            aa_idx = aa_list.index(aa)
-            aam[aa_idx][pos] = 1
-            pos = pos + 1
-        aam = aam.reshape((1,20,978))
-            
-        pred_score = model.predict([aam, fp])
-        pred_score = pred_score[0][0]
-        if pred_score < 0:
-            pred_score = 0
-        # elif pred_score > 1:
-        #     pred_score = 1
-            
+    def model_prediction(aamatrix, fp, model):            
+        pred_score = model.predict([aamatrix, fp])            
         return pred_score
 
     #define a function to rank the molecules by their Tanimoto score against the input molecule.
     def tanimoto_ranker(query, model): #query must be a SMILES string
-        df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
         simil = []
         for i in df_mol['SMILES']:
             simil.append(float(tanimoto_calc(query,i)))
         df_mol['Tanimoto_score_vs_query'] = simil
         
-        if flag:
-            affin = []
-            for j in df_mol['AA_sequence']:
-                affin.append(model_prediction(j,query,model))
-        else:
-            idx_simil = sorted(range(len(simil)), key=lambda k: simil[k], reverse=True)[0:num_check]
-            affin = [None] * len(simil)
-            for j in idx_simil:
-                affin[j] = model_prediction(df_mol['AA_sequence'][j],query,model)
+        fp = smi_cod(query)
+        fp = np.repeat(fp, np.shape(aamatrix)[0], axis=0)
+        
+        preds = model_prediction(aamatrix,fp,model)
+        affin = preds[:,0].tolist()
             
         df_mol['Affinity prediction'] = affin
         
-        df_mol = df_mol.sort_values(by=['Tanimoto_score_vs_query'], ascending=False).reset_index(drop=True)
-        return df_mol
+        df_mol_sorted = df_mol.sort_values(by=['Tanimoto_score_vs_query'], ascending=False).reset_index(drop=True)
+        return df_mol_sorted
     
-    st.write("Use these options to decide if predictions are performed over all" 
-             " the database. Otherwise, they will be performed only on the"
-             " first 100/500/1000.")
+    # st.write("Use these options to decide if predictions are performed over all" 
+    #          " the database. Otherwise, they will be performed only on the"
+    #          " first 100/500/1000.")
     
-    check = st.radio("Select an option:",
-                     ("Perform predictions over all the database",
-                      "Perform predictions over the first 100",
-                      "Perform predictions over the first 500",
-                      "Perform predictions over the first 1000"))
+    # check = st.radio("Select an option:",
+    #                  ("Perform predictions over all the database",
+    #                   "Perform predictions over the first 100",
+    #                   "Perform predictions over the first 500",
+    #                   "Perform predictions over the first 1000"))
     
-    if check == "Perform predictions over all the database":
-        flag = True
-    elif check == "Perform predictions over the first 100":
-        flag = False
-        num_check = 100
-    elif check == "Perform predictions over the first 500":
-        flag = False
-        num_check = 500
-    elif check == "Perform predictions over the first 1000":
-        flag = False
-        num_check = 1000
+    # if check == "Perform predictions over all the database":
+    #     flag = True
+    # elif check == "Perform predictions over the first 100":
+    #     flag = False
+    #     num_check = 100
+    # elif check == "Perform predictions over the first 500":
+    #     flag = False
+    #     num_check = 500
+    # elif check == "Perform predictions over the first 1000":
+    #     flag = False
+    #     num_check = 1000
     
 
     # user input text boxes for SMILES
     user_input_mol = st.text_input("Paste molecule in SMILES format")
     if user_input_mol != "" and chem_validator(user_input_mol):
-        # loads predictive model
-        pred_model = tf.keras.models.load_model('./final_model')
         df = tanimoto_ranker(user_input_mol, pred_model)
         # df_head = df.head(100)
         st.write(df)
@@ -157,7 +134,8 @@ def app():
             file_name='molecular_prediction_results.csv',
             mime='text/csv'
         )
-        barchartDataframe(df_head)
+        # barchartDataframe(df_head)
+        barchartDataframe(df)
     else:
         st.write("Please, paste your target molecule in SMILES format in the box above or paste some example molecules:")
         st.code('''Examples:
