@@ -141,8 +141,8 @@ def app():
         # loads predictive model
         pred_model = tf.keras.models.load_model('./final_model')
         df = tanimoto_ranker(user_input_mol, pred_model)
-        df_head = df.head(100)
-        st.write(df_head)
+        # df_head = df.head(100)
+        st.write(df)
 
         @st.cache
         def convert_df(dataframe):
