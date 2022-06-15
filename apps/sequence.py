@@ -13,6 +13,8 @@ import seaborn as sns
 import collections
 import matplotlib.pyplot as plt
 
+from precalc import seq_cod
+
 def barchartDataframe(dataframe):
     #Graphing the dataset
     molecules = dataframe.drop_duplicates(subset=['Molecule'])
@@ -44,59 +46,39 @@ def app():
     Use this page to find similar entries in the database using your target protein sequence as input.
     """)
     
+    database = pd.read_csv('./TF_DB_clean_pathway.csv')
+    fpmatrix = np.load('./fingerprints_matrix.npy')
+    pred_model = tf.keras.models.load_model('./final_model')
+    
     #define a function to predict affinity between a molecule and a sequence
-    def model_prediction(seq, smi, model):
-        ms = Chem.MolFromSmiles(smi)
-        fp = Chem.RDKFingerprint(ms, fpSize = 512).ToBitString()
-        fp = np.array([int(x) for x in list(fp)])
-        fp = fp.reshape((1,512))
-        
-        aa_list = ["A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R",
-                    "S","T","V","W","Y"]
-        aam = np.zeros((20, 978)).astype(int)
-        pos = 0
-        for aa in seq:
-            if aa == "*" or aa == "X":
-                pos = pos + 1
-                continue
-            aa_idx = aa_list.index(aa)
-            aam[aa_idx][pos] = 1
-            pos = pos + 1
-        aam = aam.reshape((1,20,978))
-            
-        pred_score = model.predict([aam, fp])
-        pred_score = pred_score[0][0]
-        if pred_score < 0:
-            pred_score = 0
-        # elif pred_score > 1:
-        #     pred_score = 1
-            
+    #define a function to predict affinity between a molecule and a sequence
+    def model_prediction(aa, fpmatrix, model):            
+        pred_score = model.predict([aa, fpmatrix])            
         return pred_score
     
     
-    st.write("Use these options to decide if predictions are performed over all" 
-             " the database. Otherwise, they will be performed only on the"
-             " first 100/500/1000.")
+    # st.write("Use these options to decide if predictions are performed over all" 
+    #          " the database. Otherwise, they will be performed only on the"
+    #          " first 100/500/1000.")
     
-    check = st.radio("Select an option:",
-                     ("Perform predictions over all the database",
-                      "Perform predictions over the first 100",
-                      "Perform predictions over the first 500",
-                      "Perform predictions over the first 1000"))
+    # check = st.radio("Select an option:",
+    #                  ("Perform predictions over all the database",
+    #                   "Perform predictions over the first 100",
+    #                   "Perform predictions over the first 500",
+    #                   "Perform predictions over the first 1000"))
     
-    if check == "Perform predictions over all the database":
-        flag = True
-    elif check == "Perform predictions over the first 100":
-        flag = False
-        num_check = 100
-    elif check == "Perform predictions over the first 500":
-        flag = False
-        num_check = 500
-    elif check == "Perform predictions over the first 1000":
-        flag = False
-        num_check = 1000
+    # if check == "Perform predictions over all the database":
+    #     flag = True
+    # elif check == "Perform predictions over the first 100":
+    #     flag = False
+    #     num_check = 100
+    # elif check == "Perform predictions over the first 500":
+    #     flag = False
+    #     num_check = 500
+    # elif check == "Perform predictions over the first 1000":
+    #     flag = False
+    #     num_check = 1000
     
-    database = pd.read_csv('./TF_DB_clean_pathway.csv')
         
     user_input_seq = st.text_input("Paste sequence string")
     validate = False
@@ -120,19 +102,11 @@ def app():
 
         df = database.merge(blast_df).sort_values(by=['bit_score'], ascending=False).reset_index(drop=True)
         
-        #loads predictive model
-        pred_model = tf.keras.models.load_model('./final_model')
+        aa = seq_cod(user_input_seq)
+        aa = np.repeat(aa, np.shape(fpmatrix)[0], axis=0)
         
-        if flag:
-            affin = []
-            for j in df['SMILES']:
-                affin.append(model_prediction(user_input_seq,j,pred_model))
-        else:
-            affin = [None] * len(df)
-            idx = 0
-            for j in df['SMILES'][0:num_check]:
-                affin[idx] = model_prediction(user_input_seq,j,pred_model)
-                idx += 1
+        preds = model_prediction(aa,fpmatrix,pred_model)
+        affin = preds[:,0].tolist()
             
         df['Affinity prediction'] = affin
         
