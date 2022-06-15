@@ -6,3 +6,4 @@ rdkit-pypi
 seaborn
 matplotlib
 tensorflow
+lfs
