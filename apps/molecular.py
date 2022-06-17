@@ -48,7 +48,7 @@ def app():
     """)
     
     df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
-    aamatrix = np.load('./sequences_matrix.npy')
+    aamatrix = np.load('./sequences_matrix.npz')
     pred_model = tf.keras.models.load_model('./final_model')
     
     
