@@ -47,9 +47,14 @@ def app():
     Use this page to find similar entries in the database using your target protein sequence as input.
     """)
     
-    database = pd.read_csv('./TF_DB_clean_pathway.csv')
-    #fpmatrix = np.load('./fingerprints_matrix.npy')
-    pred_model = tf.keras.models.load_model('./final_model')
+    @st.cache
+    def load_files():
+        database = pd.read_csv('./TF_DB_clean_pathway.csv')
+        pred_model = tf.keras.models.load_model('./final_model')
+        
+        return database, pred_model
+    
+    database, pred_model = load_files()
     
     #define a function to predict affinity between a molecule and a sequence
     #define a function to predict affinity between a molecule and a sequence
