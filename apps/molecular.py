@@ -56,6 +56,7 @@ def app():
         return tf.keras.models.load_model('./final_model')
     
     pred_model = load_files()
+
     
     
     # validate SMILE input
