@@ -47,9 +47,15 @@ def app():
 
     """)
     
+    
     df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
     aamatrix = np.load('./sequences_matrix.npz')['arr_0']
-    pred_model = tf.keras.models.load_model('./final_model')
+    
+    #@st.cache
+    def load_files():
+        return tf.keras.models.load_model('./final_model')
+    
+    pred_model = load_files()
     
     
     # validate SMILE input
@@ -121,7 +127,7 @@ def app():
         # df_head = df.head(100)
         st.write(df)
 
-        @st.cache
+        #@st.cache
         def convert_df(dataframe):
             # IMPORTANT: Cache the conversion to prevent computation on every rerun
             return dataframe.to_csv().encode('utf-8')

@@ -48,8 +48,12 @@ def app():
     """)
     
     database = pd.read_csv('./TF_DB_clean_pathway.csv')
-    #fpmatrix = np.load('./fingerprints_matrix.npy')
-    pred_model = tf.keras.models.load_model('./final_model')
+    
+    @st.cache
+    def load_files():
+        return tf.keras.models.load_model('./final_model')
+    
+    pred_model = load_files()
     
     #define a function to predict affinity between a molecule and a sequence
     #define a function to predict affinity between a molecule and a sequence
@@ -120,7 +124,7 @@ def app():
         
         st.write(df)
 
-        @st.cache
+        #@st.cache
         def convert_df(dataframe):
             # IMPORTANT: Cache the conversion to prevent computation on every rerun
             return dataframe.to_csv().encode('utf-8')
