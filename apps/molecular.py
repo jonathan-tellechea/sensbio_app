@@ -49,13 +49,8 @@ def app():
     
     
     df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
-    aamatrix = np.load('./sequences_matrix.npz')['arr_0']
-    
-    #@st.cache
-    def load_files():
-        return tf.keras.models.load_model('./final_model')
-    
-    pred_model = load_files()
+    aamatrix = np.load('./sequences_matrix.npz')['arr_0']  
+    pred_model = tf.keras.models.load_model('./final_model')
 
     
     
@@ -97,29 +92,7 @@ def app():
         
         df_mol_sorted = df_mol.sort_values(by=['Tanimoto_score_vs_query'], ascending=False).reset_index(drop=True)
         return df_mol_sorted
-    
-    # st.write("Use these options to decide if predictions are performed over all" 
-    #          " the database. Otherwise, they will be performed only on the"
-    #          " first 100/500/1000.")
-    
-    # check = st.radio("Select an option:",
-    #                  ("Perform predictions over all the database",
-    #                   "Perform predictions over the first 100",
-    #                   "Perform predictions over the first 500",
-    #                   "Perform predictions over the first 1000"))
-    
-    # if check == "Perform predictions over all the database":
-    #     flag = True
-    # elif check == "Perform predictions over the first 100":
-    #     flag = False
-    #     num_check = 100
-    # elif check == "Perform predictions over the first 500":
-    #     flag = False
-    #     num_check = 500
-    # elif check == "Perform predictions over the first 1000":
-    #     flag = False
-    #     num_check = 1000
-    
+        
 
     # user input text boxes for SMILES
     user_input_mol = st.text_input("Paste molecule in SMILES format")
@@ -128,7 +101,7 @@ def app():
         # df_head = df.head(100)
         st.write(df)
 
-        #@st.cache
+        @st.cache
         def convert_df(dataframe):
             # IMPORTANT: Cache the conversion to prevent computation on every rerun
             return dataframe.to_csv().encode('utf-8')

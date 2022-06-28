@@ -30,28 +30,6 @@ def smi_cod(smi):
     return fp
 
 
-# def data_cod(seq, smi):
-#     ms = Chem.MolFromSmiles(smi)
-#     fp = Chem.RDKFingerprint(ms, fpSize = 512).ToBitString()
-#     fp = np.array([int(x) for x in list(fp)])
-#     fp = fp.reshape((1,512))
-    
-#     aa_list = ["A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R",
-#                "S","T","V","W","Y"]
-#     aam = np.zeros((20, 978)).astype(int)
-#     pos = 0
-#     for aa in seq:
-#         if aa == "*" or aa == "X":
-#             pos = pos + 1
-#             continue
-#         aa_idx = aa_list.index(aa)
-#         aam[aa_idx][pos] = 1
-#         pos = pos + 1
-#     aam = aam.reshape((1,20,978))
-            
-#     return aam, fp
-
-
 def aam3d(db):
     
     aamatrix = seq_cod(db['AA_sequence'][0])
@@ -78,7 +56,7 @@ def fp3d(db):
     return  fpmatrix
 
 def pre_calc(flag):
-    if flag:
+    if flag == True:
         df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
         
         aamatrix = aam3d(df_mol)

@@ -47,42 +47,14 @@ def app():
     Use this page to find similar entries in the database using your target protein sequence as input.
     """)
     
-    database = pd.read_csv('./TF_DB_clean_pathway.csv')
-    
-    @st.cache
-    def load_files():
-        return tf.keras.models.load_model('./final_model')
-    
-    pred_model = load_files()
+    database = pd.read_csv('./TF_DB_clean_pathway.csv')   
+    pred_model = tf.keras.models.load_model('./final_model')
     
     #define a function to predict affinity between a molecule and a sequence
     #define a function to predict affinity between a molecule and a sequence
     def model_prediction(aa, fpmatrix, model):            
         pred_score = model.predict([aa, fpmatrix])            
         return pred_score
-    
-    
-    # st.write("Use these options to decide if predictions are performed over all" 
-    #          " the database. Otherwise, they will be performed only on the"
-    #          " first 100/500/1000.")
-    
-    # check = st.radio("Select an option:",
-    #                  ("Perform predictions over all the database",
-    #                   "Perform predictions over the first 100",
-    #                   "Perform predictions over the first 500",
-    #                   "Perform predictions over the first 1000"))
-    
-    # if check == "Perform predictions over all the database":
-    #     flag = True
-    # elif check == "Perform predictions over the first 100":
-    #     flag = False
-    #     num_check = 100
-    # elif check == "Perform predictions over the first 500":
-    #     flag = False
-    #     num_check = 500
-    # elif check == "Perform predictions over the first 1000":
-    #     flag = False
-    #     num_check = 1000
     
         
     user_input_seq = st.text_input("Paste sequence string")
@@ -124,7 +96,7 @@ def app():
         
         st.write(df)
 
-        #@st.cache
+        @st.cache
         def convert_df(dataframe):
             # IMPORTANT: Cache the conversion to prevent computation on every rerun
             return dataframe.to_csv().encode('utf-8')
