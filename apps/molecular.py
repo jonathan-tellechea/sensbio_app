@@ -45,6 +45,8 @@ def app():
 
     Use this page to find similar entries in the database using your target compound in SMILES format as input.
 
+    The final score obtained in the table is the result of adding a 10% of the affinity prediction score to the Tanimoto score.    
+
     """)
     
     
@@ -87,8 +89,12 @@ def app():
         
         preds = model_prediction(aamatrix,fp,model)
         affin = preds[:,0].tolist()
+        
+        #final score
+        score = (np.array(simil)+0.1*np.array(affin)).tolist()
             
         df_mol['Affinity prediction'] = affin
+        df_mol['Final score'] = score 
         
         df_mol_sorted = df_mol.sort_values(by=['Tanimoto_score_vs_query'], ascending=False).reset_index(drop=True)
         return df_mol_sorted
