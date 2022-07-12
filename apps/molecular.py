@@ -49,11 +49,15 @@ def app():
 
     """)
     
+    @st.experimental_memo
+    def load_files():
+        df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
+        aamatrix = np.load('./sequences_matrix.npz')['arr_0']  
+        pred_model = tf.keras.models.load_model('./final_model')
+        
+        return df_mol, aamatrix, pred_model
     
-    df_mol = pd.read_csv('./TF_DB_clean_pathway.csv')
-    aamatrix = np.load('./sequences_matrix.npz')['arr_0']  
-    pred_model = tf.keras.models.load_model('./final_model')
-
+    df_mol, aamatrix, pred_model = load_files()
     
     
     # validate SMILE input
