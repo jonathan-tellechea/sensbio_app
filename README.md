@@ -23,4 +23,7 @@ Using sensbio-app is really simple. The application is separated in three differ
     - Visualize the genetic variety of the database.
 - **Molecular prediction page:** use to identify possible TFs triggered by your input molecule.
 - **TF sequence prediction page:** use to TFs in the database similar to your input protein sequence.
-    
+
+# License
+
+This project is licensed under the terms of the MIT license.
