@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/437254304.svg)](https://zenodo.org/badge/latestdoi/437254304)
 
 # About Sensbio
 
